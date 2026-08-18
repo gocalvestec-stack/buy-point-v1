@@ -1,0 +1,7 @@
+<?php
+require_once __DIR__.'/../config/init.php';require_once __DIR__.'/../auth/verificar.php';
+$produtos=$pdo->query("SELECT * FROM produtos WHERE ativo=1 ORDER BY nome")->fetchAll();?>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Produtos</title><link rel="stylesheet" href="../assets/css/style.css"></head><body>
+<?php include __DIR__.'/../partials/menu.php';?><main class="main"><div class="topline"><div><h1>Produtos</h1><p class="muted">Cadastro e controle.</p></div><a class="btn primary" href="cadastrar.php">+ Novo produto</a></div>
+<div class="panel"><table><thead><tr><th>Código</th><th>Produto</th><th>Categoria</th><th>Unidade</th><th>Preço</th><th>Estoque</th><th>Mínimo</th><th>Ações</th></tr></thead><tbody>
+<?php foreach($produtos as $p):?><tr><td><?=htmlspecialchars($p['codigo'])?></td><td><?=htmlspecialchars($p['nome'])?></td><td><?=htmlspecialchars($p['categoria']??'-')?></td><td><?=htmlspecialchars($p['unidade'])?></td><td>R$ <?=number_format($p['preco'],2,',','.')?></td><td><?=number_format($p['estoque'],2,',','.')?></td><td><?=number_format($p['estoque_minimo'],2,',','.')?></td><td><a href="editar.php?id=<?=$p['id']?>">Editar</a> · <a href="excluir.php?id=<?=$p['id']?>" onclick="return confirm('Desativar este produto?')">Excluir</a></td></tr><?php endforeach;?></tbody></table></div></main></body></html>

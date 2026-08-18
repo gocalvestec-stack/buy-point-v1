@@ -1,0 +1,1 @@
+<?php require_once __DIR__.'/../config/init.php';require_once __DIR__.'/../auth/verificar.php';$id=(int)($_GET['id']??0);if($id)$pdo->prepare("UPDATE produtos SET ativo=0 WHERE id=?")->execute([$id]);header('Location:index.php');exit;

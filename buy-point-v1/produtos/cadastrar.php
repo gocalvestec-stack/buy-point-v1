@@ -1,0 +1,11 @@
+<?php
+require_once __DIR__.'/../config/init.php';require_once __DIR__.'/../auth/verificar.php';$erro='';
+if($_SERVER['REQUEST_METHOD']==='POST'){
+$codigo=trim($_POST['codigo']??'');$nome=trim($_POST['nome']??'');$categoria=trim($_POST['categoria']??'');$unidade=trim($_POST['unidade']??'UN');$preco=(float)$_POST['preco'];$min=(float)$_POST['estoque_minimo'];$qtd=(float)$_POST['estoque'];
+if(!$codigo||!$nome)$erro='Código e nome são obrigatórios.';else try{$pdo->beginTransaction();
+$s=$pdo->prepare("INSERT INTO produtos(codigo,nome,categoria,unidade,preco,estoque,estoque_minimo) VALUES(?,?,?,?,?,?,?)");$s->execute([$codigo,$nome,$categoria,$unidade,$preco,$qtd,$min]);$id=$pdo->lastInsertId();
+if($qtd>0)$pdo->prepare("INSERT INTO movimentacoes_estoque(produto_id,usuario_id,tipo,quantidade,observacao) VALUES(?,?,?,?,?)")->execute([$id,$_SESSION['usuario_id'],'ENTRADA',$qtd,'Estoque inicial']);
+$pdo->commit();header('Location:index.php');exit;}catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();$erro='Não foi possível cadastrar. Verifique se o código já existe.';}}
+?>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Novo produto</title><link rel="stylesheet" href="../assets/css/style.css"></head><body><?php include __DIR__.'/../partials/menu.php';?><main class="main"><h1>Novo produto</h1><?php if($erro):?><div class="alert danger"><?=htmlspecialchars($erro)?></div><?php endif;?><div class="panel"><form method="post" class="form-grid">
+<label>Código<input name="codigo" required></label><label>Nome<input name="nome" required></label><label>Categoria<input name="categoria"></label><label>Unidade<input name="unidade" value="UN"></label><label>Preço<input type="number" step="0.01" name="preco" value="0"></label><label>Estoque inicial<input type="number" step="0.01" min="0" name="estoque" value="0"></label><label>Estoque mínimo<input type="number" step="0.01" min="0" name="estoque_minimo" value="0"></label><div class="actions"><a class="btn" href="index.php">Cancelar</a><button class="btn primary">Salvar</button></div></form></div></main></body></html>
